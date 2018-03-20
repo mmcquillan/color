@@ -15,3 +15,6 @@ Options:
 
 
 `--background`
+
+
+`--strip`

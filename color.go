@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/fatih/color"
@@ -16,7 +17,9 @@ func main() {
 	Color := flag.String("color", "", "Color to highlight")
 	Background := flag.Bool("background", false, "Background highlighting [false]")
 	Pattern := flag.String("pattern", "", "Pattern to highlight")
+	Strip := flag.Bool("strip", false, "Strip all colors [false]")
 	flag.Parse()
+	strip := *Strip
 
 	// check color
 	highlight := color.FgWhite
@@ -51,21 +54,28 @@ func main() {
 			highlight = color.FgMagenta
 		}
 	}
-	if highlight == color.FgWhite {
+	if highlight == color.FgWhite && !strip {
 		fmt.Fprintln(os.Stderr, "ERROR: Not a valid color")
 	}
 	reColor := color.New(highlight).SprintFunc()
 
 	// check for pattern
 	pattern := *Pattern
-	if pattern == "" {
+	if pattern == "" && !strip {
 		fmt.Fprintln(os.Stderr, "ERROR: No provided pattern")
 	}
+
+	// strip patterns
+	stripreg := regexp.MustCompile("(\\033|\\027)\\[[0-9]*m")
 
 	// setup standard input
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		fmt.Println(strings.Replace(scanner.Text(), pattern, reColor(pattern), -1))
+		if strip {
+			fmt.Println(stripreg.ReplaceAllString(scanner.Text(), ""))
+		} else {
+			fmt.Println(strings.Replace(scanner.Text(), pattern, reColor(pattern), -1))
+		}
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "ERROR: ", err)
