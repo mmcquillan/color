@@ -36,7 +36,7 @@ func main() {
 		case "magenta":
 			highlight = color.BgMagenta
 		case "cyan":
-			highlight = color.BgMagenta
+			highlight = color.BgCyan
 		}
 	} else {
 		switch strings.ToLower(*Color) {
@@ -51,7 +51,7 @@ func main() {
 		case "magenta":
 			highlight = color.FgMagenta
 		case "cyan":
-			highlight = color.FgMagenta
+			highlight = color.FgCyan
 		}
 	}
 	if highlight == color.FgWhite && !strip {
